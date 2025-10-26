@@ -10,7 +10,7 @@ import Link from 'next/link';
 export default async function ReceiptPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const session = await getServerSession(authOptions);
 
@@ -18,11 +18,17 @@ export default async function ReceiptPage({
     redirect('/login');
   }
 
+  const { id } = await params;
+
   const rental = await prisma.rental.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       customer: true,
-      mouldType: true,
+      items: {
+        include: {
+          mouldType: true,
+        },
+      },
       createdBy: {
         select: {
           name: true,
@@ -129,9 +135,15 @@ export default async function ReceiptPage({
             Rental Details
           </h3>
           <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Mould Type:</span>
-              <span className="font-medium">{rental.mouldType.name}</span>
+            <div>
+              <span className="text-gray-600">Mould(s) Rented:</span>
+              <div className="ml-4 mt-1 space-y-1">
+                {rental.items.map((item) => (
+                  <div key={item.id} className="font-medium">
+                    {item.mouldType.name} × {item.quantity}
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Pickup Date & Time:</span>

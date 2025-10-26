@@ -13,7 +13,7 @@ import { formatCurrency, formatDateTime } from '@/lib/utils';
 export default async function RentalDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const session = await getServerSession(authOptions);
 
@@ -21,11 +21,17 @@ export default async function RentalDetailPage({
     redirect('/login');
   }
 
+  const { id } = await params;
+
   const rental = await prisma.rental.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       customer: true,
-      mouldType: true,
+      items: {
+        include: {
+          mouldType: true,
+        },
+      },
       createdBy: {
         select: {
           name: true,
@@ -139,8 +145,14 @@ export default async function RentalDetailPage({
             </CardHeader>
             <CardContent className="space-y-3">
               <div>
-                <div className="text-sm text-muted-foreground">Mould Type</div>
-                <div className="font-medium">{rental.mouldType.name}</div>
+                <div className="text-sm text-muted-foreground">Mould(s) Rented</div>
+                <div className="space-y-1 mt-1">
+                  {rental.items.map((item) => (
+                    <div key={item.id} className="font-medium">
+                      {item.mouldType.name} × {item.quantity}
+                    </div>
+                  ))}
+                </div>
               </div>
               <div>
                 <div className="text-sm text-muted-foreground">Status</div>
