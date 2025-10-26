@@ -21,7 +21,11 @@ export async function GET(
         customerId,
       },
       include: {
-        mouldType: true,
+        items: {
+          include: {
+            mouldType: true,
+          },
+        },
         createdBy: {
           select: {
             name: true,
