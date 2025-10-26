@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -28,7 +28,7 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const mouldId = params.id;
+    const { id: mouldId } = await params;
 
     const mould = await prisma.mouldType.update({
       where: { id: mouldId },

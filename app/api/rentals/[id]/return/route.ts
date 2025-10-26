@@ -6,7 +6,7 @@ import { calculateRentalCharges } from '@/lib/rental-calculations';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -16,7 +16,7 @@ export async function POST(
     }
 
     const body = await request.json();
-    const rentalId = params.id;
+    const { id: rentalId } = await params;
 
     // Get rental with items
     const rental = await prisma.rental.findUnique({

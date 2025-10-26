@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -16,7 +16,7 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const userId = params.id;
+    const { id: userId } = await params;
 
     const updateData: any = {
       name: body.name,
@@ -54,7 +54,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -63,7 +63,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = params.id;
+    const { id: userId } = await params;
 
     // Don't allow deleting yourself
     if (userId === session.user.id) {
