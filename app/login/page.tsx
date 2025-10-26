@@ -50,8 +50,8 @@ export default function LoginPage() {
               <Package className="h-8 w-8 text-primary-foreground" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">Mould Rental Tracker</CardTitle>
-          <CardDescription>Sign in to manage your rentals</CardDescription>
+          <CardTitle className="text-2xl font-bold">Floor Masters</CardTitle>
+          <CardDescription>Sign in to your tracking system</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

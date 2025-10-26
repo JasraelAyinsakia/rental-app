@@ -79,7 +79,7 @@ export default async function DashboardPage() {
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">
-            Overview of your mould rental business
+            Overview of your floor rental business
           </p>
         </div>
 
@@ -115,7 +115,7 @@ export default async function DashboardPage() {
             >
               <h3 className="font-semibold">New Rental</h3>
               <p className="text-sm text-muted-foreground">
-                Create a new mould rental
+                Create a new floor mould rental
               </p>
             </Link>
             <Link
@@ -131,9 +131,9 @@ export default async function DashboardPage() {
               href="/moulds"
               className="p-4 border rounded-lg hover:bg-accent transition-colors"
             >
-              <h3 className="font-semibold">Manage Moulds</h3>
+              <h3 className="font-semibold">Manage Floor Moulds</h3>
               <p className="text-sm text-muted-foreground">
-                View mould inventory
+                View floor mould inventory
               </p>
             </Link>
           </CardContent>

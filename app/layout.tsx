@@ -6,8 +6,8 @@ import { SessionProvider } from '@/components/providers/session-provider';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Mould Rental Tracker",
-  description: "Track mould rentals, payments, and returns",
+  title: "Floor Masters - Tracking System",
+  description: "Professional floor mould rental tracking system for inventory management, rentals, and revenue tracking",
 };
 
 export default function RootLayout({

@@ -31,7 +31,7 @@ const navItems = [
     roles: ['ADMIN', 'STAFF'],
   },
   {
-    title: 'Moulds',
+    title: 'Floor Moulds',
     href: '/moulds',
     icon: Package,
     roles: ['ADMIN', 'STAFF'],
@@ -72,14 +72,15 @@ export function Sidebar({ userRole }: SidebarProps) {
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center h-16 px-6 border-b">
+          <Link href="/dashboard" className="flex items-center h-16 px-6 border-b hover:bg-accent/50 transition-colors">
             <Package className="h-6 w-6 text-primary" />
             {!collapsed && (
-              <span className="ml-3 text-lg font-semibold">
-                Mould Tracker
-              </span>
+              <div className="ml-3">
+                <div className="text-sm font-bold leading-tight">Floor Masters</div>
+                <div className="text-xs text-muted-foreground">Tracking System</div>
+              </div>
             )}
-          </div>
+          </Link>
 
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto py-4">
