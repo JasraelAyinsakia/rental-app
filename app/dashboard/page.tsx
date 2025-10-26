@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, Package, AlertTriangle, TrendingUp } from 'lucide-react';
@@ -108,7 +109,7 @@ export default async function DashboardPage() {
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <a
+            <Link
               href="/rentals/new"
               className="p-4 border rounded-lg hover:bg-accent transition-colors"
             >
@@ -116,8 +117,8 @@ export default async function DashboardPage() {
               <p className="text-sm text-muted-foreground">
                 Create a new mould rental
               </p>
-            </a>
-            <a
+            </Link>
+            <Link
               href="/rentals"
               className="p-4 border rounded-lg hover:bg-accent transition-colors"
             >
@@ -125,8 +126,8 @@ export default async function DashboardPage() {
               <p className="text-sm text-muted-foreground">
                 See all active and past rentals
               </p>
-            </a>
-            <a
+            </Link>
+            <Link
               href="/moulds"
               className="p-4 border rounded-lg hover:bg-accent transition-colors"
             >
@@ -134,7 +135,7 @@ export default async function DashboardPage() {
               <p className="text-sm text-muted-foreground">
                 View mould inventory
               </p>
-            </a>
+            </Link>
           </CardContent>
         </Card>
       </div>

@@ -47,12 +47,14 @@ export default function ReturnRentalPage() {
 
   useEffect(() => {
     fetchRental();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (returnDateTime && rental) {
       calculateCharges();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [returnDateTime, rental]);
 
   const fetchRental = async () => {

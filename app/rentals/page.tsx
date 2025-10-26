@@ -51,6 +51,7 @@ export default function RentalsPage() {
 
   useEffect(() => {
     filterRentals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rentals, searchQuery, statusFilter]);
 
   const fetchRentals = async () => {
