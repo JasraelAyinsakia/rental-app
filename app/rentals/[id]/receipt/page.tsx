@@ -4,8 +4,8 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { formatCurrency, formatDateTime } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Printer } from 'lucide-react';
 import Link from 'next/link';
+import { ReceiptActions } from './receipt-actions';
 
 export default async function ReceiptPage({
   params,
@@ -60,18 +60,7 @@ export default async function ReceiptPage({
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       {/* Action Buttons */}
-      <div className="max-w-4xl mx-auto mb-4 no-print flex justify-between">
-        <Link href={`/rentals/${rental.id}`}>
-          <Button variant="ghost" className="gap-2">
-            <ArrowLeft size={16} />
-            Back
-          </Button>
-        </Link>
-        <Button onClick={() => window.print()} className="gap-2">
-          <Printer size={16} />
-          Print Receipt
-        </Button>
-      </div>
+      <ReceiptActions rentalId={rental.id} />
 
       {/* Receipt */}
       <div className="max-w-4xl mx-auto bg-white p-8 shadow-lg print:shadow-none">
