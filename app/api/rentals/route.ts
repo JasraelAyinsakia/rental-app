@@ -130,9 +130,25 @@ export async function POST(request: Request) {
       }
     }
     
-    // Generate receipt number
-    const count = await prisma.rental.count();
-    const receiptNumber = `MRT-${String(count + 1).padStart(6, '0')}`;
+    // Generate receipt number - find the highest existing number and increment
+    const lastRental = await prisma.rental.findFirst({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        receiptNumber: true,
+      },
+    });
+
+    let receiptNumber: string;
+    if (lastRental && lastRental.receiptNumber) {
+      // Extract the number from the last receipt number (e.g., "MRT-000003" -> 3)
+      const lastNumber = parseInt(lastRental.receiptNumber.split('-')[1]) || 0;
+      receiptNumber = `MRT-${String(lastNumber + 1).padStart(6, '0')}`;
+    } else {
+      // First rental
+      receiptNumber = 'MRT-000001';
+    }
 
     // Check if customer exists or create new
     let customer = await prisma.customer.findFirst({

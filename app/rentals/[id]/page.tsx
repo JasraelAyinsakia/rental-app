@@ -6,7 +6,7 @@ import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Printer, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Printer, CheckCircle, Edit } from 'lucide-react';
 import Link from 'next/link';
 import { formatCurrency, formatDateTime } from '@/lib/utils';
 
@@ -84,6 +84,14 @@ export default async function RentalDetailPage({
             </div>
           </div>
           <div className="flex gap-2">
+            {rental.status === 'ACTIVE' && session.user.role === 'ADMIN' && (
+              <Link href={`/rentals/${rental.id}/edit`}>
+                <Button variant="outline" className="gap-2">
+                  <Edit size={16} />
+                  Edit
+                </Button>
+              </Link>
+            )}
             {rental.status === 'ACTIVE' && (
               <Link href={`/rentals/${rental.id}/return`}>
                 <Button className="gap-2">

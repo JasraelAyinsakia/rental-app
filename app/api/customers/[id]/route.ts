@@ -48,6 +48,82 @@ export async function GET(
   }
 }
 
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    // Only ADMIN can edit customers
+    if (!session || session.user.role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: 'Unauthorized. Only administrators can edit customers.' },
+        { status: 403 }
+      );
+    }
+
+    const { id } = await params;
+    const body = await request.json();
+
+    // Validate required fields
+    if (!body.fullName || !body.contactNumber || !body.ghanaCardId) {
+      return NextResponse.json(
+        { error: 'Full name, contact number, and Ghana Card ID are required' },
+        { status: 400 }
+      );
+    }
+
+    // Check if customer exists
+    const existingCustomer = await prisma.customer.findUnique({
+      where: { id },
+    });
+
+    if (!existingCustomer) {
+      return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
+    }
+
+    // Check if Ghana Card ID is being changed to one that already exists
+    if (body.ghanaCardId !== existingCustomer.ghanaCardId) {
+      const duplicateCheck = await prisma.customer.findFirst({
+        where: {
+          ghanaCardId: body.ghanaCardId,
+          id: { not: id },
+        },
+      });
+
+      if (duplicateCheck) {
+        return NextResponse.json(
+          { error: 'A customer with this Ghana Card ID already exists' },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Update customer
+    const customer = await prisma.customer.update({
+      where: { id },
+      data: {
+        fullName: body.fullName,
+        contactNumber: body.contactNumber,
+        ghanaCardId: body.ghanaCardId,
+        ghanaCardCollected: body.ghanaCardCollected,
+        ghanaCardCollectedDate: body.ghanaCardCollected 
+          ? (existingCustomer.ghanaCardCollectedDate || new Date())
+          : null,
+      },
+    });
+
+    return NextResponse.json(customer);
+  } catch (error) {
+    console.error('Error updating customer:', error);
+    return NextResponse.json(
+      { error: 'Failed to update customer' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
