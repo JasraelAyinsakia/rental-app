@@ -30,12 +30,19 @@ export default function NewRentalPage() {
   const [moulds, setMoulds] = useState<MouldType[]>([]);
   const [error, setError] = useState('');
 
+  // Get current date/time in datetime-local format (YYYY-MM-DDThh:mm)
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    return now.toISOString().slice(0, 16);
+  };
+
   const [formData, setFormData] = useState({
     fullName: '',
     contactNumber: '',
     ghanaCardId: '',
     ghanaCardCollected: false,
-    pickupDateTime: '',
+    pickupDateTime: getCurrentDateTime(),
     depositAmount: 1000,
     dailyRate: 100,
   });
@@ -233,6 +240,7 @@ export default function NewRentalPage() {
                     onChange={handleInputChange}
                     required
                     disabled={loading}
+                    className="text-base"
                   />
                 </div>
 
