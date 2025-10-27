@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Plus, Search, Eye, CheckCircle } from 'lucide-react';
+import { Plus, Search, Eye, CheckCircle, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { formatCurrency, formatDateTime } from '@/lib/utils';
 
@@ -89,6 +89,27 @@ export default function RentalsPage() {
     }
 
     setFilteredRentals(filtered);
+  };
+
+  const handleDeleteRental = async (rentalId: string, receiptNumber: string) => {
+    if (!confirm(`Are you sure you want to delete rental ${receiptNumber}? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/rentals/${rentalId}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        fetchRentals();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to delete rental');
+      }
+    } catch (error) {
+      alert('An error occurred while deleting the rental.');
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -219,6 +240,16 @@ export default function RentalsPage() {
                               </Button>
                             </Link>
                           )}
+                          {session.user.role === 'ADMIN' && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteRental(rental.id, rental.receiptNumber)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -286,6 +317,17 @@ export default function RentalsPage() {
                           Return
                         </Button>
                       </Link>
+                    )}
+                    {session.user.role === 'ADMIN' && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeleteRental(rental.id, rental.receiptNumber)}
+                        className="flex-1 gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                      >
+                        <Trash2 size={16} />
+                        Delete
+                      </Button>
                     )}
                   </div>
                 </div>

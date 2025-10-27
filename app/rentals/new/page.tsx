@@ -312,6 +312,7 @@ export default function NewRentalPage() {
                             min="1"
                             value={item.quantity}
                             onChange={(e) => updateMouldItem(index, 'quantity', parseInt(e.target.value) || 1)}
+                            onFocus={(e) => e.target.select()}
                             required
                             disabled={loading}
                           />

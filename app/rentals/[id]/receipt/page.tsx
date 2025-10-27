@@ -50,10 +50,10 @@ export default async function ReceiptPage({
     );
   }
 
-  const companyName = process.env.NEXT_PUBLIC_COMPANY_NAME || 'Mould Rental Company';
-  const companyAddress = process.env.NEXT_PUBLIC_COMPANY_ADDRESS || 'Your Business Address';
-  const companyContact = process.env.NEXT_PUBLIC_COMPANY_CONTACT || 'Contact Number';
-  const companyEmail = process.env.NEXT_PUBLIC_COMPANY_EMAIL || 'email@company.com';
+  const companyName = process.env.NEXT_PUBLIC_COMPANY_NAME || 'Floor Masters Crete System';
+  const companyAddress = process.env.NEXT_PUBLIC_COMPANY_ADDRESS || 'Accra, Ghana';
+  const companyContact = process.env.NEXT_PUBLIC_COMPANY_CONTACT || '+233553618426';
+  const companyEmail = process.env.NEXT_PUBLIC_COMPANY_EMAIL || 'simonziyaba@gmail.com';
 
   const isReturnReceipt = rental.status === 'RETURNED';
 
