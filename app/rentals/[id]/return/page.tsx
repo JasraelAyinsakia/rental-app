@@ -20,9 +20,12 @@ interface Rental {
     fullName: string;
     contactNumber: string;
   };
-  mouldType: {
-    name: string;
-  };
+  items: {
+    mouldType: {
+      name: string;
+    };
+    quantity: number;
+  }[];
   pickupDateTime: string;
   depositAmount: number;
   dailyRate: number;
@@ -146,8 +149,14 @@ export default function ReturnRentalPage() {
                 <div className="font-medium">{rental.customer.fullName}</div>
               </div>
               <div>
-                <div className="text-sm text-muted-foreground">Mould Type</div>
-                <div className="font-medium">{rental.mouldType.name}</div>
+                <div className="text-sm text-muted-foreground">Mould Type(s)</div>
+                <div className="space-y-1">
+                  {rental.items.map((item, idx) => (
+                    <div key={idx} className="font-medium">
+                      {item.mouldType.name} × {item.quantity}
+                    </div>
+                  ))}
+                </div>
               </div>
               <div>
                 <div className="text-sm text-muted-foreground">Pickup Date</div>

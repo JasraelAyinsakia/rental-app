@@ -27,9 +27,12 @@ interface Rental {
     contactNumber: string;
     ghanaCardId: string;
   };
-  mouldType: {
-    name: string;
-  };
+  items: {
+    mouldType: {
+      name: string;
+    };
+    quantity: number;
+  }[];
   pickupDateTime: string;
   returnDateTime: string | null;
   status: string;
@@ -113,7 +116,7 @@ export default function RentalsPage() {
           <div>
             <h1 className="text-3xl font-bold">Rentals</h1>
             <p className="text-muted-foreground">
-              Manage all mould rentals and returns
+              Manage all floor mould rentals and returns
             </p>
           </div>
           <Link href="/rentals/new">
@@ -164,7 +167,7 @@ export default function RentalsPage() {
                 <TableRow>
                   <TableHead>Receipt #</TableHead>
                   <TableHead>Customer</TableHead>
-                  <TableHead>Mould Type</TableHead>
+                  <TableHead>Mould Type(s)</TableHead>
                   <TableHead>Pickup Date</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Deposit</TableHead>
@@ -187,7 +190,14 @@ export default function RentalsPage() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>{rental.mouldType.name}</TableCell>
+                    <TableCell>
+                      {rental.items.map((item, idx) => (
+                        <div key={idx}>
+                          {item.mouldType.name}
+                          {item.quantity > 1 && ` (×${item.quantity})`}
+                        </div>
+                      ))}
+                    </TableCell>
                     <TableCell>
                       {formatDateTime(rental.pickupDateTime)}
                     </TableCell>
