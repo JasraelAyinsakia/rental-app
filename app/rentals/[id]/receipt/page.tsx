@@ -232,7 +232,7 @@ export default async function ReceiptPage({
             <div className="border-b border-gray-400 mb-2 h-12"></div>
             <p className="text-sm text-center">
               Authorized Signature<br />
-              <span className="text-xs text-gray-600">({rental.createdBy.name})</span>
+              <span className="text-xs text-gray-600">(Emmanuel Ziyaba)</span>
             </p>
           </div>
         </div>
