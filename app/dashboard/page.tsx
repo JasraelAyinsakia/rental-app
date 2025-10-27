@@ -75,7 +75,7 @@ export default async function DashboardPage() {
             Welcome back, {session.user.name}! 👋
           </h1>
           <p className="text-blue-100 text-lg">
-            Here's what's happening with your floor rental business today
+            Here&apos;s what&apos;s happening with your floor rental business today
           </p>
         </div>
 
