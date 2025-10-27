@@ -226,7 +226,10 @@ export default async function ReceiptPage({
         <div className="grid grid-cols-2 gap-8 mt-12 pt-6 border-t-2">
           <div>
             <div className="border-b border-gray-400 mb-2 h-12"></div>
-            <p className="text-sm text-center">Customer Signature</p>
+            <p className="text-sm text-center">
+              Customer Signature<br />
+              <span className="text-xs text-gray-600">({rental.customer.fullName})</span>
+            </p>
           </div>
           <div>
             <div className="border-b border-gray-400 mb-2 h-12"></div>
