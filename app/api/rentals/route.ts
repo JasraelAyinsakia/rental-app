@@ -87,6 +87,49 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     
+    // Validate required fields
+    if (!body.fullName || !body.contactNumber || !body.ghanaCardId) {
+      return NextResponse.json(
+        { error: 'Missing required customer information' },
+        { status: 400 }
+      );
+    }
+
+    if (!body.pickupDateTime) {
+      return NextResponse.json(
+        { error: 'Pickup date and time is required' },
+        { status: 400 }
+      );
+    }
+
+    if (!body.items || body.items.length === 0) {
+      return NextResponse.json(
+        { error: 'At least one mould type must be selected' },
+        { status: 400 }
+      );
+    }
+
+    // Validate mould availability
+    for (const item of body.items) {
+      const mould = await prisma.mouldType.findUnique({
+        where: { id: item.mouldTypeId },
+      });
+
+      if (!mould) {
+        return NextResponse.json(
+          { error: `Mould type not found` },
+          { status: 404 }
+        );
+      }
+
+      if (mould.available < item.quantity) {
+        return NextResponse.json(
+          { error: `Insufficient quantity available for ${mould.name}. Only ${mould.available} available.` },
+          { status: 400 }
+        );
+      }
+    }
+    
     // Generate receipt number
     const count = await prisma.rental.count();
     const receiptNumber = `MRT-${String(count + 1).padStart(6, '0')}`;
@@ -167,8 +210,12 @@ export async function POST(request: Request) {
     return NextResponse.json(rental);
   } catch (error) {
     console.error('Error creating rental:', error);
+    
+    // Return more specific error message
+    const errorMessage = error instanceof Error ? error.message : 'Failed to create rental';
+    
     return NextResponse.json(
-      { error: 'Failed to create rental' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
