@@ -62,17 +62,16 @@ export default function ReturnRentalPage() {
 
   const fetchRental = async () => {
     try {
-      const res = await fetch(`/api/rentals?search=${params.id}`);
+      const res = await fetch(`/api/rentals/${params.id}`);
       if (res.ok) {
         const data = await res.json();
-        const foundRental = data.find((r: Rental) => r.id === params.id);
-        if (foundRental) {
-          setRental(foundRental);
-          // Set default return time to now
-          const now = new Date();
-          const formatted = now.toISOString().slice(0, 16);
-          setReturnDateTime(formatted);
-        }
+        setRental(data);
+        // Set default return time to now
+        const now = new Date();
+        const formatted = now.toISOString().slice(0, 16);
+        setReturnDateTime(formatted);
+      } else {
+        console.error('Failed to fetch rental');
       }
     } catch (error) {
       console.error('Error fetching rental:', error);
