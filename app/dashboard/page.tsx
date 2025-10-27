@@ -7,24 +7,55 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DollarSign, Package, AlertTriangle, Plus, Eye, List, ArrowRight } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { prisma } from '@/lib/prisma';
 
 async function getStats() {
-  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/stats`, {
-    cache: 'no-store',
-  });
+  try {
+    // Fetch stats directly from the database instead of using fetch
+    const activeRentals = await prisma.rental.count({
+      where: { status: 'ACTIVE' },
+    });
 
-  if (!res.ok) {
+    const now = new Date();
+    const tenDaysAgo = new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000);
+    
+    const overdueRentals = await prisma.rental.count({
+      where: {
+        status: 'ACTIVE',
+        pickupDateTime: {
+          lt: tenDaysAgo,
+        },
+      },
+    });
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const dailyRevenue = await prisma.rental.aggregate({
+      where: {
+        status: 'RETURNED',
+        returnDateTime: {
+          gte: today,
+        },
+      },
+      _sum: {
+        totalCharge: true,
+      },
+    });
+
+    return {
+      activeRentals,
+      overdueRentals,
+      dailyRevenue: dailyRevenue._sum.totalCharge || 0,
+    };
+  } catch (error) {
+    console.error('Error fetching stats:', error);
     return {
       activeRentals: 0,
       overdueRentals: 0,
       dailyRevenue: 0,
-      weeklyRevenue: 0,
-      monthlyRevenue: 0,
     };
   }
-
-  return res.json();
 }
 
 export default async function DashboardPage() {
