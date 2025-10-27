@@ -131,23 +131,53 @@ export async function POST(request: Request) {
     }
     
     // Generate receipt number - find the highest existing number and increment
-    const lastRental = await prisma.rental.findFirst({
-      orderBy: {
-        createdAt: 'desc',
-      },
+    const allRentals = await prisma.rental.findMany({
       select: {
         receiptNumber: true,
       },
     });
 
-    let receiptNumber: string;
-    if (lastRental && lastRental.receiptNumber) {
-      // Extract the number from the last receipt number (e.g., "MRT-000003" -> 3)
-      const lastNumber = parseInt(lastRental.receiptNumber.split('-')[1]) || 0;
-      receiptNumber = `MRT-${String(lastNumber + 1).padStart(6, '0')}`;
-    } else {
-      // First rental
-      receiptNumber = 'MRT-000001';
+    let receiptNumber: string = '';
+    let receiptExists = true;
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    while (receiptExists && attempts < maxAttempts) {
+      if (allRentals.length === 0 && attempts === 0) {
+        // First rental
+        receiptNumber = 'MRT-000001';
+      } else {
+        // Extract all numbers and find the maximum
+        const numbers = allRentals
+          .map(r => {
+            const parts = r.receiptNumber.split('-');
+            return parseInt(parts[1]) || 0;
+          })
+          .filter(n => !isNaN(n));
+        
+        const maxNumber = Math.max(...numbers, 0);
+        receiptNumber = `MRT-${String(maxNumber + 1 + attempts).padStart(6, '0')}`;
+      }
+
+      // Check if this receipt number already exists
+      const existing = await prisma.rental.findUnique({
+        where: { receiptNumber },
+      });
+
+      if (!existing) {
+        receiptExists = false;
+      } else {
+        attempts++;
+        // If it exists, add it to our list and try again
+        allRentals.push({ receiptNumber });
+      }
+    }
+
+    if (receiptExists || !receiptNumber) {
+      return NextResponse.json(
+        { error: 'Unable to generate unique receipt number. Please try again.' },
+        { status: 500 }
+      );
     }
 
     // Check if customer exists or create new
