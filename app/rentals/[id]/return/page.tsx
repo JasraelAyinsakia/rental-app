@@ -119,8 +119,24 @@ export default function ReturnRentalPage() {
     }
   };
 
-  if (!session || !rental) {
-    return null;
+  if (!session) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!rental) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Loading rental...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
