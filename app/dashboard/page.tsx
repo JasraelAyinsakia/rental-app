@@ -5,8 +5,7 @@ import Link from 'next/link';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { DollarSign, Package, AlertTriangle, Plus, Eye, List, ArrowRight } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import { Package, AlertTriangle, Plus, Eye, ArrowRight, Cuboid } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 
 async function getStats() {
@@ -86,15 +85,6 @@ export default async function DashboardPage() {
       bgColor: 'bg-red-500',
       bgLight: 'bg-red-50',
     },
-    {
-      title: "Today's Revenue",
-      description: 'Earnings today',
-      value: formatCurrency(stats.dailyRevenue),
-      icon: DollarSign,
-      color: 'text-green-600',
-      bgColor: 'bg-green-500',
-      bgLight: 'bg-green-50',
-    },
   ];
 
   return (
@@ -111,7 +101,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2">
           {statCards.map((stat) => {
             const Icon = stat.icon;
             return (
@@ -139,56 +129,62 @@ export default async function DashboardPage() {
           })}
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Primary Action */}
-          <Card className="border-2 border-primary shadow-lg hover:shadow-xl transition-all">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Plus className="h-5 w-5" />
-                Create New Rental
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                Start a new floor mould rental transaction. Record customer details, 
-                select moulds, and generate a receipt.
-              </p>
-              <Link href="/rentals/new">
-                <Button className="w-full gap-2" size="lg">
-                  New Rental
+        {/* Quick Actions - Redesigned */}
+        <div className="grid gap-6 md:grid-cols-3">
+          {/* Create New Rental */}
+          <Link href="/rentals/new">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] cursor-pointer bg-gradient-to-br from-blue-500 to-indigo-600 text-white h-full">
+              <CardContent className="p-6 flex flex-col items-center justify-center text-center space-y-4 min-h-[200px]">
+                <div className="p-4 bg-white/20 rounded-2xl backdrop-blur-sm">
+                  <Plus className="h-10 w-10" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Create New Rental</h3>
+                  <p className="text-sm text-blue-50">
+                    Start a new floor mould rental transaction
+                  </p>
+                </div>
+                <Button variant="secondary" className="gap-2 mt-auto">
+                  Get Started
                   <ArrowRight className="h-4 w-4" />
                 </Button>
-              </Link>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
 
-          {/* Secondary Actions */}
-          <Card className="shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader>
-              <CardTitle>Quick Links</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Link href="/rentals">
-                <Button variant="outline" className="w-full justify-start gap-3" size="lg">
-                  <Eye className="h-5 w-5 text-blue-600" />
-                  <div className="text-left">
-                    <div className="font-semibold">View All Rentals</div>
-                    <div className="text-xs text-muted-foreground">Manage active and past rentals</div>
-                  </div>
-                </Button>
-              </Link>
-              <Link href="/moulds">
-                <Button variant="outline" className="w-full justify-start gap-3" size="lg">
-                  <List className="h-5 w-5 text-green-600" />
-                  <div className="text-left">
-                    <div className="font-semibold">Floor Mould Inventory</div>
-                    <div className="text-xs text-muted-foreground">Check stock and availability</div>
-                  </div>
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+          {/* View Rentals */}
+          <Link href="/rentals">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] cursor-pointer h-full">
+              <CardContent className="p-6 flex flex-col items-center justify-center text-center space-y-4 min-h-[200px]">
+                <div className="p-4 bg-blue-50 rounded-2xl">
+                  <Eye className="h-10 w-10 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">View Rentals</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Manage active and past rental records
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Mould Inventory */}
+          <Link href="/moulds">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] cursor-pointer h-full">
+              <CardContent className="p-6 flex flex-col items-center justify-center text-center space-y-4 min-h-[200px]">
+                <div className="p-4 bg-green-50 rounded-2xl">
+                  <Cuboid className="h-10 w-10 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Mould Inventory</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Check stock levels and availability
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </div>
     </DashboardLayout>
