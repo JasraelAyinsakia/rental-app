@@ -98,7 +98,21 @@ export async function POST(request: Request) {
       },
     });
 
-    if (!customer) {
+    if (customer) {
+      // Update existing customer with latest information
+      customer = await prisma.customer.update({
+        where: { id: customer.id },
+        data: {
+          fullName: body.fullName,
+          contactNumber: body.contactNumber,
+          ghanaCardCollected: body.ghanaCardCollected,
+          ghanaCardCollectedDate: body.ghanaCardCollected 
+            ? new Date() 
+            : (customer.ghanaCardCollected ? customer.ghanaCardCollectedDate : null),
+        },
+      });
+    } else {
+      // Create new customer
       customer = await prisma.customer.create({
         data: {
           fullName: body.fullName,

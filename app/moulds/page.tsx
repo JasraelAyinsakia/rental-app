@@ -15,7 +15,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Package, Edit, Save, X } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Package, Edit, Save, X, Plus } from 'lucide-react';
 
 interface MouldType {
   id: string;
@@ -33,6 +34,9 @@ export default function MouldsPage() {
     quantity: 0,
     available: 0,
   });
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newMould, setNewMould] = useState({ name: '', quantity: 0, available: 0 });
+  const [addError, setAddError] = useState('');
 
   // Check if user can manage inventory
   const canManageInventory = session?.user.role === 'ADMIN' || 
@@ -107,6 +111,49 @@ export default function MouldsPage() {
     }
   };
 
+  const handleAddMould = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddError('');
+
+    if (!newMould.name.trim()) {
+      setAddError('Mould type name is required');
+      return;
+    }
+
+    if (newMould.available > newMould.quantity) {
+      setAddError('Available quantity cannot exceed total quantity');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/moulds', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newMould),
+      });
+
+      if (res.ok) {
+        fetchMoulds();
+        setShowAddForm(false);
+        setNewMould({ name: '', quantity: 0, available: 0 });
+        setAddError('');
+      } else {
+        const data = await res.json();
+        setAddError(data.error || 'Failed to add mould type');
+      }
+    } catch (error) {
+      setAddError('An error occurred');
+    }
+  };
+
+  const handleCancelAdd = () => {
+    setShowAddForm(false);
+    setNewMould({ name: '', quantity: 0, available: 0 });
+    setAddError('');
+  };
+
   if (!session) {
     return null;
   }
@@ -114,12 +161,79 @@ export default function MouldsPage() {
   return (
     <DashboardLayout userName={session.user.name} userRole={session.user.role}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Mould Inventory</h1>
-          <p className="text-muted-foreground">
-            Track availability of all mould types
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">Mould Inventory</h1>
+            <p className="text-muted-foreground">
+              Track availability of all mould types
+            </p>
+          </div>
+          {canManageInventory && (
+            <Button onClick={() => setShowAddForm(true)} className="gap-2 w-full sm:w-auto">
+              <Plus size={16} />
+              Add Mould Type
+            </Button>
+          )}
         </div>
+
+        {showAddForm && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Add New Mould Type</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleAddMould} className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Mould Type Name *</Label>
+                    <Input
+                      id="name"
+                      value={newMould.name}
+                      onChange={(e) => setNewMould({ ...newMould, name: e.target.value })}
+                      placeholder="e.g., Royal ashler B2"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="quantity">Total Quantity</Label>
+                    <Input
+                      id="quantity"
+                      type="number"
+                      min="0"
+                      value={newMould.quantity}
+                      onChange={(e) => setNewMould({ ...newMould, quantity: parseInt(e.target.value) || 0 })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="available">Available</Label>
+                    <Input
+                      id="available"
+                      type="number"
+                      min="0"
+                      max={newMould.quantity}
+                      value={newMould.available}
+                      onChange={(e) => setNewMould({ ...newMould, available: parseInt(e.target.value) || 0 })}
+                    />
+                  </div>
+                </div>
+                {addError && (
+                  <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
+                    {addError}
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <Button type="submit" className="gap-2">
+                    <Save size={16} />
+                    Add Mould Type
+                  </Button>
+                  <Button type="button" variant="outline" onClick={handleCancelAdd}>
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
@@ -173,99 +287,201 @@ export default function MouldsPage() {
                 Loading moulds...
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Mould Name</TableHead>
-                    <TableHead>Total Quantity</TableHead>
-                    <TableHead>Available</TableHead>
-                    <TableHead>Currently Rented</TableHead>
-                    <TableHead>Status</TableHead>
-                    {canManageInventory && (
-                      <TableHead className="text-right">Actions</TableHead>
-                    )}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <>
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Mould Name</TableHead>
+                        <TableHead>Total Quantity</TableHead>
+                        <TableHead>Available</TableHead>
+                        <TableHead>Currently Rented</TableHead>
+                        <TableHead>Status</TableHead>
+                        {canManageInventory && (
+                          <TableHead className="text-right">Actions</TableHead>
+                        )}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {moulds.map((mould) => (
+                        <TableRow key={mould.id}>
+                          <TableCell className="font-medium">{mould.name}</TableCell>
+                          <TableCell>
+                            {editingId === mould.id ? (
+                              <Input
+                                type="number"
+                                min="0"
+                                value={editValues.quantity}
+                                onChange={(e) =>
+                                  setEditValues({
+                                    ...editValues,
+                                    quantity: parseInt(e.target.value) || 0,
+                                  })
+                                }
+                                className="w-20"
+                              />
+                            ) : (
+                              mould.quantity
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {editingId === mould.id ? (
+                              <Input
+                                type="number"
+                                min="0"
+                                max={editValues.quantity}
+                                value={editValues.available}
+                                onChange={(e) =>
+                                  setEditValues({
+                                    ...editValues,
+                                    available: parseInt(e.target.value) || 0,
+                                  })
+                                }
+                                className="w-20"
+                              />
+                            ) : (
+                              mould.available
+                            )}
+                          </TableCell>
+                          <TableCell>{mould.quantity - mould.available}</TableCell>
+                          <TableCell>
+                            {getAvailabilityBadge(mould.available, mould.quantity)}
+                          </TableCell>
+                          {canManageInventory && (
+                            <TableCell className="text-right">
+                              {editingId === mould.id ? (
+                                <div className="flex justify-end gap-2">
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleSave(mould.id)}
+                                    className="gap-1"
+                                  >
+                                    <Save size={14} />
+                                    Save
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={handleCancelEdit}
+                                  >
+                                    <X size={14} />
+                                  </Button>
+                                </div>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleEdit(mould)}
+                                >
+                                  <Edit size={14} />
+                                </Button>
+                              )}
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="md:hidden space-y-4">
                   {moulds.map((mould) => (
-                    <TableRow key={mould.id}>
-                      <TableCell className="font-medium">{mould.name}</TableCell>
-                      <TableCell>
+                    <Card key={mould.id}>
+                      <CardContent className="pt-6 space-y-3">
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-semibold text-lg">{mould.name}</h3>
+                          {getAvailabilityBadge(mould.available, mould.quantity)}
+                        </div>
+                        
                         {editingId === mould.id ? (
-                          <Input
-                            type="number"
-                            min="0"
-                            value={editValues.quantity}
-                            onChange={(e) =>
-                              setEditValues({
-                                ...editValues,
-                                quantity: parseInt(e.target.value) || 0,
-                              })
-                            }
-                            className="w-20"
-                          />
-                        ) : (
-                          mould.quantity
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {editingId === mould.id ? (
-                          <Input
-                            type="number"
-                            min="0"
-                            max={editValues.quantity}
-                            value={editValues.available}
-                            onChange={(e) =>
-                              setEditValues({
-                                ...editValues,
-                                available: parseInt(e.target.value) || 0,
-                              })
-                            }
-                            className="w-20"
-                          />
-                        ) : (
-                          mould.available
-                        )}
-                      </TableCell>
-                      <TableCell>{mould.quantity - mould.available}</TableCell>
-                      <TableCell>
-                        {getAvailabilityBadge(mould.available, mould.quantity)}
-                      </TableCell>
-                      {canManageInventory && (
-                        <TableCell className="text-right">
-                          {editingId === mould.id ? (
-                            <div className="flex justify-end gap-2">
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <Label className="text-xs text-muted-foreground">Total Quantity</Label>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  value={editValues.quantity}
+                                  onChange={(e) =>
+                                    setEditValues({
+                                      ...editValues,
+                                      quantity: parseInt(e.target.value) || 0,
+                                    })
+                                  }
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs text-muted-foreground">Available</Label>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  max={editValues.quantity}
+                                  value={editValues.available}
+                                  onChange={(e) =>
+                                    setEditValues({
+                                      ...editValues,
+                                      available: parseInt(e.target.value) || 0,
+                                    })
+                                  }
+                                />
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
                               <Button
                                 size="sm"
                                 onClick={() => handleSave(mould.id)}
-                                className="gap-1"
+                                className="gap-1 flex-1"
                               >
                                 <Save size={14} />
                                 Save
                               </Button>
                               <Button
                                 size="sm"
-                                variant="ghost"
+                                variant="outline"
                                 onClick={handleCancelEdit}
+                                className="flex-1"
                               >
                                 <X size={14} />
+                                Cancel
                               </Button>
                             </div>
-                          ) : (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleEdit(mould)}
-                            >
-                              <Edit size={14} />
-                            </Button>
-                          )}
-                        </TableCell>
-                      )}
-                    </TableRow>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="grid grid-cols-3 gap-4 text-sm">
+                              <div>
+                                <p className="text-muted-foreground text-xs">Total</p>
+                                <p className="font-semibold">{mould.quantity}</p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground text-xs">Available</p>
+                                <p className="font-semibold">{mould.available}</p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground text-xs">Rented</p>
+                                <p className="font-semibold">{mould.quantity - mould.available}</p>
+                              </div>
+                            </div>
+                            {canManageInventory && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleEdit(mould)}
+                                className="w-full gap-2"
+                              >
+                                <Edit size={14} />
+                                Edit Inventory
+                              </Button>
+                            )}
+                          </>
+                        )}
+                      </CardContent>
+                    </Card>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

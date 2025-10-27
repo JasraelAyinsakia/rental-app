@@ -138,16 +138,16 @@ export default function NewRentalPage() {
 
   return (
     <DashboardLayout userName={session.user.name} userRole={session.user.role}>
-      <div className="space-y-6 max-w-3xl">
-        <div className="flex items-center gap-4">
+      <div className="space-y-6 max-w-3xl mx-auto px-4 sm:px-0">
+        <div className="flex items-center gap-3">
           <Link href="/rentals">
             <Button variant="ghost" size="icon">
               <ArrowLeft size={20} />
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold">New Rental</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold">New Rental</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Create a new mould rental record
             </p>
           </div>
@@ -269,7 +269,7 @@ export default function NewRentalPage() {
 
               {/* Mould Selection */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <h3 className="text-lg font-semibold">Moulds to Rent</h3>
                   <Button
                     type="button"
@@ -277,7 +277,7 @@ export default function NewRentalPage() {
                     size="sm"
                     onClick={addMouldItem}
                     disabled={loading}
-                    className="gap-2"
+                    className="gap-2 w-full sm:w-auto"
                   >
                     <Plus size={16} />
                     Add Mould
@@ -286,7 +286,7 @@ export default function NewRentalPage() {
 
                 <div className="space-y-3">
                   {mouldItems.map((item, index) => (
-                    <div key={index} className="flex gap-3 items-end">
+                    <div key={index} className="flex flex-col sm:flex-row gap-3 sm:items-end p-4 border rounded-lg sm:border-0 sm:p-0">
                       <div className="flex-1 space-y-2">
                         <Label>Mould Type *</Label>
                         <Select
@@ -304,29 +304,31 @@ export default function NewRentalPage() {
                         </Select>
                       </div>
 
-                      <div className="w-24 space-y-2">
-                        <Label>Quantity</Label>
-                        <Input
-                          type="number"
-                          min="1"
-                          value={item.quantity}
-                          onChange={(e) => updateMouldItem(index, 'quantity', parseInt(e.target.value) || 1)}
-                          required
-                          disabled={loading}
-                        />
-                      </div>
+                      <div className="flex gap-3 items-end">
+                        <div className="flex-1 sm:w-24 space-y-2">
+                          <Label>Quantity</Label>
+                          <Input
+                            type="number"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(e) => updateMouldItem(index, 'quantity', parseInt(e.target.value) || 1)}
+                            required
+                            disabled={loading}
+                          />
+                        </div>
 
-                      {mouldItems.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeMouldItem(index)}
-                          disabled={loading}
-                        >
-                          <Trash2 size={16} className="text-red-600" />
-                        </Button>
-                      )}
+                        {mouldItems.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeMouldItem(index)}
+                            disabled={loading}
+                          >
+                            <Trash2 size={16} className="text-red-600" />
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -338,12 +340,12 @@ export default function NewRentalPage() {
                 </div>
               )}
 
-              <div className="flex gap-4">
-                <Button type="submit" disabled={loading}>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button type="submit" disabled={loading} className="w-full sm:w-auto">
                   {loading ? 'Creating...' : 'Create Rental'}
                 </Button>
-                <Link href="/rentals">
-                  <Button type="button" variant="outline" disabled={loading}>
+                <Link href="/rentals" className="w-full sm:w-auto">
+                  <Button type="button" variant="outline" disabled={loading} className="w-full">
                     Cancel
                   </Button>
                 </Link>

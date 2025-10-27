@@ -152,79 +152,147 @@ export default function RentalsPage() {
           </Select>
         </div>
 
-        <div className="border rounded-lg">
-          {loading ? (
-            <div className="p-8 text-center text-muted-foreground">
-              Loading rentals...
-            </div>
-          ) : filteredRentals.length === 0 ? (
-            <div className="p-8 text-center text-muted-foreground">
-              No rentals found
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Receipt #</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Mould Type(s)</TableHead>
-                  <TableHead>Pickup Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Deposit</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredRentals.map((rental) => (
-                  <TableRow key={rental.id}>
-                    <TableCell className="font-medium">
-                      {rental.receiptNumber}
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">
-                          {rental.customer.fullName}
+        {loading ? (
+          <div className="p-8 text-center text-muted-foreground border rounded-lg">
+            Loading rentals...
+          </div>
+        ) : filteredRentals.length === 0 ? (
+          <div className="p-8 text-center text-muted-foreground border rounded-lg">
+            No rentals found
+          </div>
+        ) : (
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block border rounded-lg overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Receipt #</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Mould Type(s)</TableHead>
+                    <TableHead>Pickup Date</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Deposit</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredRentals.map((rental) => (
+                    <TableRow key={rental.id}>
+                      <TableCell className="font-medium">
+                        {rental.receiptNumber}
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">
+                            {rental.customer.fullName}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {rental.customer.contactNumber}
+                          </div>
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                          {rental.customer.contactNumber}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {rental.items.map((item, idx) => (
-                        <div key={idx}>
-                          {item.mouldType.name}
-                          {item.quantity > 1 && ` (×${item.quantity})`}
-                        </div>
-                      ))}
-                    </TableCell>
-                    <TableCell>
-                      {formatDateTime(rental.pickupDateTime)}
-                    </TableCell>
-                    <TableCell>{getStatusBadge(rental.status)}</TableCell>
-                    <TableCell>{formatCurrency(rental.depositAmount)}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Link href={`/rentals/${rental.id}`}>
-                          <Button variant="ghost" size="sm">
-                            <Eye size={16} />
-                          </Button>
-                        </Link>
-                        {rental.status === 'ACTIVE' && (
-                          <Link href={`/rentals/${rental.id}/return`}>
+                      </TableCell>
+                      <TableCell>
+                        {rental.items.map((item, idx) => (
+                          <div key={idx}>
+                            {item.mouldType.name}
+                            {item.quantity > 1 && ` (×${item.quantity})`}
+                          </div>
+                        ))}
+                      </TableCell>
+                      <TableCell>
+                        {formatDateTime(rental.pickupDateTime)}
+                      </TableCell>
+                      <TableCell>{getStatusBadge(rental.status)}</TableCell>
+                      <TableCell>{formatCurrency(rental.depositAmount)}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Link href={`/rentals/${rental.id}`}>
                             <Button variant="ghost" size="sm">
-                              <CheckCircle size={16} />
+                              <Eye size={16} />
                             </Button>
                           </Link>
-                        )}
+                          {rental.status === 'ACTIVE' && (
+                            <Link href={`/rentals/${rental.id}/return`}>
+                              <Button variant="ghost" size="sm">
+                                <CheckCircle size={16} />
+                              </Button>
+                            </Link>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {filteredRentals.map((rental) => (
+                <div key={rental.id} className="border rounded-lg p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Receipt #</p>
+                      <p className="font-semibold">{rental.receiptNumber}</p>
+                    </div>
+                    {getStatusBadge(rental.status)}
+                  </div>
+
+                  <div className="border-t pt-3 space-y-2">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Customer</p>
+                      <p className="font-medium">{rental.customer.fullName}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {rental.customer.contactNumber}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs text-muted-foreground">Mould Type(s)</p>
+                      {rental.items.map((item, idx) => (
+                        <p key={idx} className="text-sm">
+                          {item.mouldType.name}
+                          {item.quantity > 1 && ` (×${item.quantity})`}
+                        </p>
+                      ))}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Pickup Date</p>
+                        <p className="text-sm">{formatDateTime(rental.pickupDateTime)}</p>
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Deposit</p>
+                        <p className="text-sm font-medium">
+                          {formatCurrency(rental.depositAmount)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border-t pt-3 flex gap-2">
+                    <Link href={`/rentals/${rental.id}`} className="flex-1">
+                      <Button variant="outline" size="sm" className="w-full gap-2">
+                        <Eye size={16} />
+                        View
+                      </Button>
+                    </Link>
+                    {rental.status === 'ACTIVE' && (
+                      <Link href={`/rentals/${rental.id}/return`} className="flex-1">
+                        <Button size="sm" className="w-full gap-2">
+                          <CheckCircle size={16} />
+                          Return
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </DashboardLayout>
   );
