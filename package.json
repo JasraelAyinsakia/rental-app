@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
-    "prisma:seed": "tsx prisma/seed.ts"
+    "prisma:seed": "tsx prisma/seed.ts",
+    "fix:inventory": "tsx scripts/fix-inventory.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
