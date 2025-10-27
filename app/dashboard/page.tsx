@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, Package, AlertTriangle, TrendingUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { DollarSign, Package, AlertTriangle, Plus, Eye, List, ArrowRight } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 
 async function getStats() {
@@ -38,106 +39,126 @@ export default async function DashboardPage() {
   const statCards = [
     {
       title: 'Active Rentals',
+      description: 'Currently rented out',
       value: stats.activeRentals,
       icon: Package,
       color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      bgColor: 'bg-blue-500',
+      bgLight: 'bg-blue-50',
     },
     {
       title: 'Overdue Rentals',
+      description: 'Need attention',
       value: stats.overdueRentals,
       icon: AlertTriangle,
       color: 'text-red-600',
-      bgColor: 'bg-red-50',
+      bgColor: 'bg-red-500',
+      bgLight: 'bg-red-50',
     },
     {
-      title: 'Daily Revenue',
+      title: "Today's Revenue",
+      description: 'Earnings today',
       value: formatCurrency(stats.dailyRevenue),
       icon: DollarSign,
       color: 'text-green-600',
-      bgColor: 'bg-green-50',
-    },
-    {
-      title: 'Weekly Revenue',
-      value: formatCurrency(stats.weeklyRevenue),
-      icon: TrendingUp,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
-    },
-    {
-      title: 'Monthly Revenue',
-      value: formatCurrency(stats.monthlyRevenue),
-      icon: TrendingUp,
-      color: 'text-indigo-600',
-      bgColor: 'bg-indigo-50',
+      bgColor: 'bg-green-500',
+      bgLight: 'bg-green-50',
     },
   ];
 
   return (
     <DashboardLayout userName={session.user.name} userRole={session.user.role}>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Overview of your floor rental business
+      <div className="space-y-8">
+        {/* Welcome Section */}
+        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-8 text-white">
+          <h1 className="text-4xl font-bold mb-2">
+            Welcome back, {session.user.name}! 👋
+          </h1>
+          <p className="text-blue-100 text-lg">
+            Here's what's happening with your floor rental business today
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {/* Stats Grid */}
+        <div className="grid gap-6 md:grid-cols-3">
           {statCards.map((stat) => {
             const Icon = stat.icon;
             return (
-              <Card key={stat.title}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {stat.title}
-                  </CardTitle>
-                  <div className={`p-2 rounded-full ${stat.bgColor}`}>
-                    <Icon className={`h-4 w-4 ${stat.color}`} />
+              <Card key={stat.title} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        {stat.title}
+                      </p>
+                      <p className="text-4xl font-bold tracking-tight">
+                        {stat.value}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {stat.description}
+                      </p>
+                    </div>
+                    <div className={`p-4 rounded-xl ${stat.bgColor}`}>
+                      <Icon className="h-7 w-7 text-white" />
+                    </div>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stat.value}</div>
                 </CardContent>
               </Card>
             );
           })}
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Link
-              href="/rentals/new"
-              className="p-4 border rounded-lg hover:bg-accent transition-colors"
-            >
-              <h3 className="font-semibold">New Rental</h3>
-              <p className="text-sm text-muted-foreground">
-                Create a new floor mould rental
+        {/* Quick Actions */}
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Primary Action */}
+          <Card className="border-2 border-primary shadow-lg hover:shadow-xl transition-all">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Plus className="h-5 w-5" />
+                Create New Rental
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                Start a new floor mould rental transaction. Record customer details, 
+                select moulds, and generate a receipt.
               </p>
-            </Link>
-            <Link
-              href="/rentals"
-              className="p-4 border rounded-lg hover:bg-accent transition-colors"
-            >
-              <h3 className="font-semibold">View Rentals</h3>
-              <p className="text-sm text-muted-foreground">
-                See all active and past rentals
-              </p>
-            </Link>
-            <Link
-              href="/moulds"
-              className="p-4 border rounded-lg hover:bg-accent transition-colors"
-            >
-              <h3 className="font-semibold">Manage Floor Moulds</h3>
-              <p className="text-sm text-muted-foreground">
-                View floor mould inventory
-              </p>
-            </Link>
-          </CardContent>
-        </Card>
+              <Link href="/rentals/new">
+                <Button className="w-full gap-2" size="lg">
+                  New Rental
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Secondary Actions */}
+          <Card className="shadow-lg hover:shadow-xl transition-shadow">
+            <CardHeader>
+              <CardTitle>Quick Links</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Link href="/rentals">
+                <Button variant="outline" className="w-full justify-start gap-3" size="lg">
+                  <Eye className="h-5 w-5 text-blue-600" />
+                  <div className="text-left">
+                    <div className="font-semibold">View All Rentals</div>
+                    <div className="text-xs text-muted-foreground">Manage active and past rentals</div>
+                  </div>
+                </Button>
+              </Link>
+              <Link href="/moulds">
+                <Button variant="outline" className="w-full justify-start gap-3" size="lg">
+                  <List className="h-5 w-5 text-green-600" />
+                  <div className="text-left">
+                    <div className="font-semibold">Floor Mould Inventory</div>
+                    <div className="text-xs text-muted-foreground">Check stock and availability</div>
+                  </div>
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </DashboardLayout>
   );
